@@ -4,6 +4,9 @@
     <script src="https://unpkg.com/vue"></script>
     <script src="https://unpkg.com/vue-cal"></script>
     <link href="https://unpkg.com/vue-cal/dist/vuecal.css" rel="stylesheet" />
+    <title>Demo</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
     <link href="./style.css" rel="stylesheet" />
     <style>
       .business-hours-morning {
@@ -14,7 +17,33 @@
         /* background-color: rgba(255, 255, 0, 0.2); */
         border-left: 5px solid rgba(0, 4, 255, 0.6);
       }
-      .vuecal__time-cell-line.hours:before {border-color: #42b983;}
+      .vuecal__time-cell-line.hours:before {
+        border-color: #42b983;
+      }
+      .case-normal {
+        border-left: 5px solid rgba(12, 134, 12, 0.6);
+        border-top: 1px solid rgba(12, 134, 12, 0.6);
+        border-bottom: 1px solid rgba(12, 134, 12, 0.6);
+        border-right: 1px solid rgba(12, 134, 12, 0.6);
+        left: 5px !important;
+        width: calc(100% - 5px) !important;
+        text-align: left;
+        padding-left: 5px;
+      }
+      .case-information {
+        border: 2px dashed red;
+        left: 5px !important;
+        width: 30px !important;
+        text-align: center;
+      }
+      .case-information .vuecal__event-time {
+        display: none;
+      }
+      .case-information .vuecal__event-content i {
+        color: red;
+        font-size: 1.2em;
+        padding-top: 5px;
+      }
     </style>
   </head>
   <body>
@@ -23,20 +52,24 @@
         <vue-cal
           id="vuecal1"
           show-week-numbers
+          hide-weekends
           :disable-views="['years', 'year', 'day', 'month']"
           :time-from="7 * 60"
           :time-to="19 * 60"
           :time-step="10"
-          :time-cell-height="10"
-          hide-weekends
+          :time-cell-height="20"
           :special-hours="specialHours"
+          :events="events"
+          :min-event-width="0"
         >
-        <template v-slot:time-cell="{ hours, minutes }">
-          <div :class="{ 'vuecal__time-cell-line': true, hours: !minutes }">
-            <strong v-if="!minutes" style="font-size: 15px">{{ hours }}</strong>
-            <!-- <span v-else style="font-size: 11px">{{ minutes }}</span> -->
-          </div>
-        </template>
+          <template v-slot:time-cell="{ hours, minutes }">
+            <div :class="{ 'vuecal__time-cell-line': true, hours: !minutes }">
+              <strong v-if="!minutes" style="font-size: 15px"
+                >{{ hours }}</strong
+              >
+              <!-- <span v-else style="font-size: 11px">{{ minutes }}</span> -->
+            </div>
+          </template>
         </vue-cal>
       </div>
     </div>
@@ -74,8 +107,8 @@
           };
           this.specialHours = {
             1: [
-              { from: 8 * 60, to: 12 * 60, class: 'business-hours-morning' },
-              { from: 12 * 60, to: 16 * 60, class: 'business-hours-afternoon' }
+              { from: 8 * 60, to: 12 * 60, class: "business-hours-morning" },
+              { from: 12 * 60, to: 16 * 60, class: "business-hours-afternoon" },
             ],
             2: dailyHours,
             3: [
@@ -85,6 +118,63 @@
             4: dailyHours,
             5: dailyHours,
           };
+
+          this.events.push(
+            {
+              start: "2021-03-01 08:00", // new Date(2018, 11 - 1, 16, 10, 30)
+              end: "2021-03-01 08:45", // new Date(2018, 11 - 1, 16, 11, 30)
+              title: "XYA123CASE AB123456",
+              content: "Slate & co. vs Best Wedding",
+              class: "case-normal",
+            },
+            {
+              start: "2021-03-01 10:00", // new Date(2018, 11 - 1, 16, 10, 30)
+              end: "2021-03-01 10:45", // new Date(2018, 11 - 1, 16, 11, 30)
+              title: "",
+              content: '<i class="fa fa-info-circle"></i>',
+              class: "case-information",
+            },
+            {
+              start: "2021-03-01 11:00", // new Date(2018, 11 - 1, 16, 10, 30)
+              end: "2021-03-01 11:20", // new Date(2018, 11 - 1, 16, 11, 30)
+              title: "XYA123CASE AB123456",
+              content: "Slate & co. vs Best Wedding",
+              class: "sport",
+              split: 1
+            },
+            {
+              start: "2021-03-01 11:10", // new Date(2018, 11 - 1, 16, 10, 30)
+              end: "2021-03-01 11:30", // new Date(2018, 11 - 1, 16, 11, 30)
+              title: "XYA123CASE AB123456",
+              content: "Slate & co. vs Best Wedding",
+              class: "health",
+              split: 1
+            },
+            {
+              start: "2021-03-01 11:20", // new Date(2018, 11 - 1, 16, 10, 30)
+              end: "2021-03-01 11:40", // new Date(2018, 11 - 1, 16, 11, 30)
+              title: "XYA123CASE AB123456",
+              content: "Slate & co. vs Best Wedding",
+              class: "health",
+              split: 1
+            },
+            {
+              start: "2021-03-01 11:30", // new Date(2018, 11 - 1, 16, 10, 30)
+              end: "2021-03-01 11:50", // new Date(2018, 11 - 1, 16, 11, 30)
+              title: "XYA123CASE AB123456",
+              content: "Slate & co. vs Best Wedding",
+              class: "health",
+              split: 1
+            },
+            {
+              start: "2021-03-01 11:40", // new Date(2018, 11 - 1, 16, 10, 30)
+              end: "2021-03-01 12:10", // new Date(2018, 11 - 1, 16, 11, 30)
+              title: "XYA123CASE AB123456",
+              content: "Slate & co. vs Best Wedding",
+              class: "health",
+              split: 1
+            }
+          );
         },
       });
     </script>
