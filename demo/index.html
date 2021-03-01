@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <script src="https://unpkg.com/vue"></script>
+    <script src="https://unpkg.com/vue-cal"></script>
+    <link href="https://unpkg.com/vue-cal/dist/vuecal.css" rel="stylesheet" />
+    <link href="./style.css" rel="stylesheet" />
+    <style>
+      .business-hours-morning {
+        /* background-color: rgba(255, 255, 0, 0.2); */
+        border-left: 5px solid rgba(255, 102, 0, 0.6);
+      }
+      .business-hours-afternoon {
+        /* background-color: rgba(255, 255, 0, 0.2); */
+        border-left: 5px solid rgba(0, 4, 255, 0.6);
+      }
+      .vuecal__time-cell-line.hours:before {border-color: #42b983;}
+    </style>
+  </head>
+  <body>
+    <div id="app">
+      <div>
+        <vue-cal
+          id="vuecal1"
+          show-week-numbers
+          :disable-views="['years', 'year', 'day', 'month']"
+          :time-from="7 * 60"
+          :time-to="19 * 60"
+          :time-step="10"
+          :time-cell-height="10"
+          hide-weekends
+          :special-hours="specialHours"
+        >
+        <template v-slot:time-cell="{ hours, minutes }">
+          <div :class="{ 'vuecal__time-cell-line': true, hours: !minutes }">
+            <strong v-if="!minutes" style="font-size: 15px">{{ hours }}</strong>
+            <!-- <span v-else style="font-size: 11px">{{ minutes }}</span> -->
+          </div>
+        </template>
+        </vue-cal>
+      </div>
+    </div>
+
+    <script>
+      var app = new Vue({
+        el: "#app",
+        components: { "vue-cal": vuecal },
+        data: () => ({
+          editable: {
+            title: false,
+            drag: true,
+            resize: true,
+            create: true,
+            delete: true,
+          },
+          events: [],
+          selectedDate: new Date(),
+        }),
+        computed: {
+          // Get the Monday of the real time current week.
+          previousFirstDayOfWeek() {
+            return new Date(
+              new Date().setDate(
+                new Date().getDate() - ((new Date().getDay() + 6) % 7)
+              )
+            );
+          },
+        },
+        created() {
+          const dailyHours = {
+            from: 9 * 60,
+            to: 18 * 60,
+            class: "business-hours-morning",
+          };
+          this.specialHours = {
+            1: [
+              { from: 8 * 60, to: 12 * 60, class: 'business-hours-morning' },
+              { from: 12 * 60, to: 16 * 60, class: 'business-hours-afternoon' }
+            ],
+            2: dailyHours,
+            3: [
+              { from: 9 * 60, to: 12 * 60, class: "business-hours-morning" },
+              { from: 14 * 60, to: 18 * 60, class: "business-hours-morning" },
+            ],
+            4: dailyHours,
+            5: dailyHours,
+          };
+        },
+      });
+    </script>
+  </body>
+</html>
