@@ -6,7 +6,10 @@
     <link href="https://unpkg.com/vue-cal/dist/vuecal.css" rel="stylesheet" />
     <title>Demo</title>
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css"
+    />
     <link href="./style.css" rel="stylesheet" />
     <style>
       .business-hours-morning {
@@ -44,31 +47,87 @@
         font-size: 1.2em;
         padding-top: 5px;
       }
+      #joh .vuecal__flex.vuecal__menu {
+        display: none;
+      }
+      
+      #joh .vuecal__title-bar {
+        /* display: none; */
+      }
+      #joh .heading-custom-1 {
+        text-align: left;
+        display: block;
+        width: 100%;
+      }
+      #joh .heading-custom-1 .heading-name {
+        padding-left: 10px;
+      }
+      #joh .heading-custom-1 .heading-add {
+        padding-right: 10px;
+        float: right;
+      }
+      .vuecal__cell .business-hours-unavailable {
+        background: repeating-linear-gradient(45deg, transparent, transparent 10px, #f2f2f2 10px, #f2f2f2 20px);/* IE 10+ */
+        color: #999;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+      }
+      .vuecal__no-event {
+        z-index: 10;
+      }
     </style>
   </head>
   <body>
     <div id="app">
       <div>
         <vue-cal
-          id="vuecal1"
+          id="joh"
           show-week-numbers
           hide-weekends
           :disable-views="['years', 'year', 'day', 'month']"
           :time-from="7 * 60"
           :time-to="19 * 60"
           :time-step="10"
-          :time-cell-height="20"
+          :time-cell-height="15"
           :special-hours="specialHours"
           :events="events"
           :min-event-width="0"
         >
           <template v-slot:time-cell="{ hours, minutes }">
             <div :class="{ 'vuecal__time-cell-line': true, hours: !minutes }">
-              <strong v-if="!minutes" style="font-size: 15px"
-                >{{ hours }}</strong
-              >
+              <strong v-if="!minutes" style="font-size: 15px">{{ hours }}</strong>
               <!-- <span v-else style="font-size: 11px">{{ minutes }}</span> -->
             </div>
+          </template>
+
+          <template v-slot:no-event>
+            Unavailable FD<br>
+            00:00 - 24:00
+          </template>
+
+          <template v-slot:weekday-heading="{ heading, view }">
+            <div class="heading-custom-1">
+              <span class="heading-name">{{ heading.date.toLocaleString('en-us', { weekday: 'short' }) }} {{ heading.date.format('ddd DD/MM') }}</span>
+              <i class="heading-add fa fa-plus" aria-hidden="true"></i>
+              <i :class="isGlobe(heading, view)" aria-hidden="true"></i>
+            </div>
+            <br>
+            
+          </template>
+
+          <template v-slot:title="{ title, view }">
+            <div class="title-custom">
+              {{ johs[0] }}
+            </div>
+          </template>
+
+          <template v-slot:arrow-prev>
+            <span></span>
+          </template>
+
+          <template v-slot:arrow-next>
+            <span></span>
           </template>
         </vue-cal>
       </div>
@@ -88,16 +147,16 @@
           },
           events: [],
           selectedDate: new Date(),
+          johs: ['Williams, Kathleen', 'Simon, Paul']
         }),
+        methods: {
+          isGlobe: function(heading, view) {
+            // TODO: add a logic of globe icon here
+            return 'heading-add fa fa-globe';
+          }
+        },
         computed: {
-          // Get the Monday of the real time current week.
-          previousFirstDayOfWeek() {
-            return new Date(
-              new Date().setDate(
-                new Date().getDate() - ((new Date().getDay() + 6) % 7)
-              )
-            );
-          },
+          
         },
         created() {
           const dailyHours = {
@@ -116,7 +175,9 @@
               { from: 14 * 60, to: 18 * 60, class: "business-hours-morning" },
             ],
             4: dailyHours,
-            5: dailyHours,
+            5: [
+              { from: 7 * 60, to: 19 * 60, class: "business-hours-unavailable" }
+            ],
           };
 
           this.events.push(
@@ -140,7 +201,6 @@
               title: "XYA123CASE AB123456",
               content: "Slate & co. vs Best Wedding",
               class: "sport",
-              split: 1
             },
             {
               start: "2021-03-01 11:10", // new Date(2018, 11 - 1, 16, 10, 30)
@@ -148,7 +208,6 @@
               title: "XYA123CASE AB123456",
               content: "Slate & co. vs Best Wedding",
               class: "health",
-              split: 1
             },
             {
               start: "2021-03-01 11:20", // new Date(2018, 11 - 1, 16, 10, 30)
@@ -156,7 +215,6 @@
               title: "XYA123CASE AB123456",
               content: "Slate & co. vs Best Wedding",
               class: "health",
-              split: 1
             },
             {
               start: "2021-03-01 11:30", // new Date(2018, 11 - 1, 16, 10, 30)
@@ -164,7 +222,6 @@
               title: "XYA123CASE AB123456",
               content: "Slate & co. vs Best Wedding",
               class: "health",
-              split: 1
             },
             {
               start: "2021-03-01 11:40", // new Date(2018, 11 - 1, 16, 10, 30)
@@ -172,8 +229,15 @@
               title: "XYA123CASE AB123456",
               content: "Slate & co. vs Best Wedding",
               class: "health",
-              split: 1
-            }
+            },
+            {
+              start: "2021-03-01 11:55", // new Date(2018, 11 - 1, 16, 10, 30)
+              end: "2021-03-01 12:40", // new Date(2018, 11 - 1, 16, 11, 30)
+              title: "XYA123CASE AB123456",
+              content: "Slate & co. vs Best Wedding",
+              class: "case-normal",
+            },
+            
           );
         },
       });
