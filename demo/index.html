@@ -4,6 +4,9 @@
     <script src="https://unpkg.com/vue"></script>
     <script src="https://unpkg.com/vue-cal"></script>
     <link href="https://unpkg.com/vue-cal/dist/vuecal.css" rel="stylesheet" />
+    <link href="https://fonts.googleapis.com/css?family=Roboto:100,300,400,500,700,900" rel="stylesheet">
+  <link href="https://cdn.jsdelivr.net/npm/@mdi/font@4.x/css/materialdesignicons.min.css" rel="stylesheet">
+  <link href="https://cdn.jsdelivr.net/npm/vuetify@2.x/dist/vuetify.min.css" rel="stylesheet">
     <title>Demo</title>
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <link
@@ -11,6 +14,8 @@
       href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css"
     />
     <link href="./style.css" rel="stylesheet" />
+    <script src="https://cdn.jsdelivr.net/npm/vue@2.x/dist/vue.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/vuetify@2.x/dist/vuetify.js"></script>
     <style>
       .color-morning {
         color:rgba(255, 102, 0, 0.6);
@@ -113,6 +118,7 @@
           :hide-view-selector="true"
           :hide-weekdays=[2]
           :small="true"
+          @event-mouse-enter="logEvents($event)"
         >
           <template v-slot:time-cell="{ hours, minutes }">
             <div :class="{ 'vuecal__time-cell-line': true, hours: !minutes }">
@@ -129,13 +135,13 @@
           <template v-slot:weekday-heading="{ heading, view }">
             <div class="heading-custom">
               <div class="heading-custom-1">
-                <span class="heading-name">{{ heading.date.toLocaleString('en-us', { weekday: 'short' }) }} {{ heading.date.format('ddd DD/MM') }}</span>
+                <span class="heading-name">{{ heading.date.toLocaleString('en-us', { weekday: 'short' }) }} {{ heading.date.format('DD/MM') }}</span>
                 <i class="heading-add fa fa-plus" aria-hidden="true"></i>
                 <i :class="isGlobe(heading, view)" aria-hidden="true"></i>
               </div>
               <div class="heading-custom-2">
-                <p class="color-morning">{{ getHeading(heading, view) }} 08:00 - 14:00 Oxford hearing room 2</p>
-                <p class="color-afternoon">14:00 - 16:00 Oxford courtroom 8</p>
+                <p class="color-morning">{{ getHeading(heading, view, 'morning') }}</p>
+                <p class="color-afternoon">{{ getHeading(heading, view, 'afternoon') }}</p>
               </div>
             </div>
             <br>
@@ -157,11 +163,30 @@
           </template>
         </vue-cal>
       </div>
+      <v-dialog v-model="showDialog">
+        <v-card>
+          <v-card-title>
+            <v-icon>{{ selectedEvent.icon }}</v-icon>
+            <span>{{ selectedEvent.title }}</span>
+            <v-spacer/>
+            <strong>{{ selectedEvent.start && selectedEvent.start.format('DD/MM/YYYY') }}</strong>
+          </v-card-title>
+          <v-card-text>
+            <p v-html="selectedEvent.contentFull"/>
+            <strong>Event details:</strong>
+            <ul>
+              <li>Event starts at: {{ selectedEvent.start && selectedEvent.start.formatTime() }}</li>
+              <li>Event ends at: {{ selectedEvent.end && selectedEvent.end.formatTime() }}</li>
+            </ul>
+          </v-card-text>
+        </v-card>
+      </v-dialog>
     </div>
 
     <script>
       var app = new Vue({
         el: "#app",
+        vuetify: new Vuetify(),
         components: { "vue-cal": vuecal },
         data: () => ({
           editable: {
@@ -171,6 +196,8 @@
             create: true,
             delete: true,
           },
+          selectedEvent: {},
+          showDialog: false,
           events: [],
           selectedDate: new Date(),
           johs: ['Williams, Kathleen', 'Simon, Paul'],
@@ -179,41 +206,58 @@
           ]
         }),
         methods: {
+          logEvents: function(event) {
+            this.selectedEvent = event;
+            this.showDialog = true;
+          },
           isGlobe: function(heading, view) {
             // TODO: add a logic of globe icon here
             return 'heading-add fa fa-globe';
           },
-          getHeading: function(heading, view) {
+          getHeading: function(heading, view, condition) {
             var days = new Array();
             var current = view.startDate;
             while (current <= view.endDate) {
-              days.push(new Date());
+              days.push(new Date(current));
               current = current.addDays(1);
             }
-            console.log(typeof days[1])
-            console.log(typeof heading.date)
+            var index = days.findIndex(x=>x.toString() === heading.date.toString()) + 1;
+           
+            if (condition === 'morning') {
+              var value = this.specialHours[index][0];
+              if (value && value.room) {
+                return value.from / 60 + ':00' + ' - ' + value.to / 60 + ':00' + ' ' + value.room;
+              }
+            } else {
+              var value = this.specialHours[index][1];
+              if (value && value.room) {
+                return value.from / 60 + ':00' + ' - ' + value.to / 60 + ':00' + ' ' + value.room;
+              }
+            }
           }
         },
         computed: {
           
         },
         created() {
-          const dailyHours = {
-            from: 9 * 60,
-            to: 18 * 60,
-            class: "business-hours-morning",
-          };
+          
           this.specialHours = {
             1: [
               { from: 8 * 60, to: 12 * 60, class: "business-hours-morning", room: "Oxford hearing room 2"  },
               { from: 12 * 60, to: 16 * 60, class: "business-hours-afternoon", room: "Oxford courtroom 8" },
             ],
-            2: dailyHours,
-            3: [
-              { from: 9 * 60, to: 12 * 60, class: "business-hours-morning" },
-              { from: 14 * 60, to: 18 * 60, class: "business-hours-morning" },
+            2: [
+              { from: 8 * 60, to: 12 * 60, class: "business-hours-morning", room: "Oxford hearing room 3"  },
+              { from: 12 * 60, to: 16 * 60, class: "business-hours-afternoon", room: "Oxford courtroom 7" },
             ],
-            4: dailyHours,
+            3: [
+              { from: 9 * 60, to: 12 * 60, class: "business-hours-morning" , room: "Oxford hearing room 1"},
+              { from: 14 * 60, to: 18 * 60, class: "business-hours-afternoon", room: "Oxford hearing room 5" },
+            ],
+            4: [
+              { from: 8 * 60, to: 12 * 60, class: "business-hours-morning", room: "Oxford hearing room 4"  },
+              { from: 12 * 60, to: 16 * 60, class: "business-hours-afternoon", room: "Oxford courtroom 9" },
+            ],
             5: [
               { from: 7 * 60, to: 19 * 60, class: "business-hours-unavailable" }
             ],
