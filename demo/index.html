@@ -42,7 +42,7 @@
           </template>
 
           <template v-slot:event="{ event, view }">
-            <div v-tooltip.right="{content: buildTooltipContent(event), html: true }">
+            <div v-tooltip.right="{content: buildEventTooltip(event), html: true }">
                 <span class="case-number">{{ event.data.caseNumber }}</span>
                 <p class="case-name">{{ event.data.caseName }}</p>
                 <p class="case-time">{{ event.data.startTime }} - {{ event.data.endTime }}</p>
@@ -55,7 +55,7 @@
           </template>
 
           <template v-slot:cell-content="{ cell, view, split, events, goNarrower }" >
-            <div class="vuecal__cell-content" v-tooltip.right="{content: 'Test' }"></div>
+            <div class="session-line" v-tooltip.right="{content: buildCellContentTooltip(view), html: true }"></div>
           </template>
 
           <template v-slot:weekday-heading="{ heading, view }">
@@ -114,7 +114,24 @@
           johs: ['Williams, Kathleen', 'Simon, Paul']
         }),
         methods: {
-          buildTooltipContent: function(event) {
+          buildCellContentTooltip: function(view) {
+            var data = {
+              startTime: '8:00',
+              endTime: '16:00',
+              locality: 'Adhoc (as directed)',
+              location: [ 'Oxford Combined Court Centre' ,'Oxford Hearing Room 1', 'Other Panel Members: DJ Peter Delvin'],
+              comment: 'This is a session comment'
+            }
+
+            return `
+              <p><strong>${data.startTime} - ${data.endTime}</strong></p>
+              <p>${data.locality}</p>
+              <p>${data.location.join('<br>')}</p>
+              <p>${data.comment}</p>
+            `;;
+          },
+          buildEventTooltip: function(event) {
+
             return `
               <p><strong>${event.data.caseName}</strong></p>
               <p>${event.data.caseNumber}</p>

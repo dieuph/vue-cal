@@ -89,3 +89,8 @@
   .case-time {
     margin: 3px
   }
+  .session-line {
+    height: 100%;
+    width: 5px;
+    z-index: 9999;
+  }
