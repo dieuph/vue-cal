@@ -4,9 +4,7 @@
     <script src="https://unpkg.com/vue"></script>
     <script src="https://unpkg.com/vue-cal"></script>
     <link href="https://unpkg.com/vue-cal/dist/vuecal.css" rel="stylesheet" />
-    <link href="https://fonts.googleapis.com/css?family=Roboto:100,300,400,500,700,900" rel="stylesheet">
-  <link href="https://cdn.jsdelivr.net/npm/@mdi/font@4.x/css/materialdesignicons.min.css" rel="stylesheet">
-  <link href="https://cdn.jsdelivr.net/npm/vuetify@2.x/dist/vuetify.min.css" rel="stylesheet">
+
     <title>Demo</title>
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <link
@@ -14,91 +12,9 @@
       href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css"
     />
     <link href="./style.css" rel="stylesheet" />
-    <script src="https://cdn.jsdelivr.net/npm/vue@2.x/dist/vue.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/vuetify@2.x/dist/vuetify.js"></script>
-    <style>
-      .color-morning {
-        color:rgba(255, 102, 0, 0.6);
-      }
-      .color-afternoon {
-        color: rgba(0, 4, 255, 0.6);
-      }
-      .business-hours-morning {
-        /* background-color: rgba(255, 255, 0, 0.2); */
-        border-left: 5px solid rgba(255, 102, 0, 0.6);
-      }
-      .business-hours-afternoon {
-        /* background-color: rgba(255, 255, 0, 0.2); */
-        border-left: 5px solid rgba(0, 4, 255, 0.6);
-      }
-      .vuecal__time-cell-line.hours:before {
-        border-color: #42b983;
-      }
-      .case-normal {
-        border-left: 5px solid rgba(12, 134, 12, 0.6);
-        border-top: 1px solid rgba(12, 134, 12, 0.6);
-        border-bottom: 1px solid rgba(12, 134, 12, 0.6);
-        border-right: 1px solid rgba(12, 134, 12, 0.6);
-        left: 5px !important;
-        width: calc(100% - 5px) !important;
-        text-align: left;
-        padding-left: 5px;
-      }
-      .case-information {
-        border: 2px dashed red;
-        left: 5px !important;
-        width: 30px !important;
-        text-align: center;
-      }
-      .case-information .vuecal__event-time {
-        display: none;
-      }
-      .case-information .vuecal__event-content i {
-        color: red;
-        font-size: 1.2em;
-        padding-top: 5px;
-      }
-      #joh .heading-custom {
-        height: 100%;
-        width: 100%;
-      }
-      #joh .heading-custom-1 {
-        text-align: left;
-        display: block;
-        width: 100%;
-        height: 50%;
-      }
-      #joh .heading-custom-2 {
-        width: 100%;
-        height: 100%;
-        display: block;
-        text-align: left;
-        padding-left: 5px;
-      }
-      #joh .vuecal__flex .vuecal__heading {
-        height: 100px;
-      }
-      #joh .heading-custom-1 .heading-name {
-        padding-left: 5px;
-        display: inline-block;
-        margin-top: 10px;
-      }
-      #joh .heading-custom-1 .heading-add {
-        padding-right: 10px;
-        float: right;
-        padding-top: 10px;
-      }
-      .vuecal__cell .business-hours-unavailable {
-        background: repeating-linear-gradient(45deg, transparent, transparent 10px, #f2f2f2 10px, #f2f2f2 20px);/* IE 10+ */
-        color: #999;
-        display: flex;
-        justify-content: center;
-        align-items: center;
-      }
-      .vuecal__no-event {
-        z-index: 10;
-      }
-    </style>
+    <link href="./tooltip.css" rel="stylesheet" />
+    <link href="./custom.css" rel="stylesheet" />
+    <script src="https://unpkg.com/v-tooltip@^2.0.0"></script>
   </head>
   <body>
     <div id="app">
@@ -108,8 +24,8 @@
           show-week-numbers
           hide-weekends
           :disable-views="['years', 'year', 'day', 'month']"
-          :time-from="7 * 60"
-          :time-to="19 * 60"
+          :time-from="8 * 60"
+          :time-to="16 * 60"
           :time-step="10"
           :time-cell-height="15"
           :special-hours="specialHours"
@@ -117,8 +33,6 @@
           :min-event-width="0"
           :hide-view-selector="true"
           :hide-weekdays=[2]
-          :small="true"
-          @event-mouse-enter="logEvents($event)"
         >
           <template v-slot:time-cell="{ hours, minutes }">
             <div :class="{ 'vuecal__time-cell-line': true, hours: !minutes }">
@@ -127,9 +41,21 @@
             </div>
           </template>
 
+          <template v-slot:event="{ event, view }">
+            <div v-tooltip.right="{content: buildTooltipContent(event), html: true }">
+                <span class="case-number">{{ event.data.caseNumber }}</span>
+                <p class="case-name">{{ event.data.caseName }}</p>
+                <p class="case-time">{{ event.data.startTime }} - {{ event.data.endTime }}</p>
+            </div>
+          </template>
+
           <template v-slot:no-event>
             Unavailable FD<br>
             00:00 - 24:00
+          </template>
+
+          <template v-slot:cell-content="{ cell, view, split, events, goNarrower }" >
+            <div class="vuecal__cell-content" v-tooltip.right="{content: 'Test' }"></div>
           </template>
 
           <template v-slot:weekday-heading="{ heading, view }">
@@ -145,7 +71,6 @@
               </div>
             </div>
             <br>
-            
           </template>
 
           <template v-slot:title="{ title, view }">
@@ -163,30 +88,16 @@
           </template>
         </vue-cal>
       </div>
-      <v-dialog v-model="showDialog">
-        <v-card>
-          <v-card-title>
-            <v-icon>{{ selectedEvent.icon }}</v-icon>
-            <span>{{ selectedEvent.title }}</span>
-            <v-spacer/>
-            <strong>{{ selectedEvent.start && selectedEvent.start.format('DD/MM/YYYY') }}</strong>
-          </v-card-title>
-          <v-card-text>
-            <p v-html="selectedEvent.contentFull"/>
-            <strong>Event details:</strong>
-            <ul>
-              <li>Event starts at: {{ selectedEvent.start && selectedEvent.start.formatTime() }}</li>
-              <li>Event ends at: {{ selectedEvent.end && selectedEvent.end.formatTime() }}</li>
-            </ul>
-          </v-card-text>
-        </v-card>
-      </v-dialog>
     </div>
 
     <script>
+      Vue.use(VTooltip)
+      Vue.directive('tooltip', VTooltip.VTooltip)
+      Vue.directive('close-popover', VTooltip.VClosePopover)
+      Vue.component('v-popover', VTooltip.VPopover)
+
       var app = new Vue({
         el: "#app",
-        vuetify: new Vuetify(),
         components: { "vue-cal": vuecal },
         data: () => ({
           editable: {
@@ -200,15 +111,19 @@
           showDialog: false,
           events: [],
           selectedDate: new Date(),
-          johs: ['Williams, Kathleen', 'Simon, Paul'],
-          headings: [
-            { date: "", }
-          ]
+          johs: ['Williams, Kathleen', 'Simon, Paul']
         }),
         methods: {
-          logEvents: function(event) {
-            this.selectedEvent = event;
-            this.showDialog = true;
+          buildTooltipContent: function(event) {
+            return `
+              <p><strong>${event.data.caseName}</strong></p>
+              <p>${event.data.caseNumber}</p>
+              <p>${event.data.caseType}</p>
+              <p>${event.data.startTime} - ${event.data.endTime}</p>
+              <p>${event.data.hearingType}</p>
+              <p>${event.data.status}</p>
+              <p>${event.data.recurrenceDetails}</p>
+            `;
           },
           isGlobe: function(heading, view) {
             // TODO: add a logic of globe icon here
@@ -270,6 +185,16 @@
               title: "XYA123CASE AB123456",
               content: "Slate & co. vs Best Wedding",
               class: "case-normal",
+              data: {
+                caseName: 'Gill Vs Stanley',
+                caseNumber: '123456789012345678901234567890',
+                caseType: 'Decree Nisi- ID -5 (case type)',
+                startTime: '08:00',
+                endTime: '08:45',
+                hearingType: 'Application',
+                status: 'Fixed - Unlikely to be moved,',
+                recurrenceDetails: 'Hearing 1 of 2'
+              }
             },
             {
               start: "2021-03-01 10:00", // new Date(2018, 11 - 1, 16, 10, 30)
@@ -277,6 +202,16 @@
               title: "",
               content: '<i class="fa fa-info-circle"></i>',
               class: "case-information",
+              data: {
+                caseName: '',
+                caseNumber: '',
+                caseType: '',
+                startTime: '08:00',
+                endTime: '08:45',
+                hearingType: 'Application',
+                status: 'Fixed - Unlikely to be moved,',
+                recurrenceDetails: 'Hearing 1 of 2'
+              }
             },
             {
               start: "2021-03-01 11:00", // new Date(2018, 11 - 1, 16, 10, 30)
@@ -284,6 +219,16 @@
               title: "XYA123CASE AB123456",
               content: "Slate & co. vs Best Wedding",
               class: "sport",
+              data: {
+                caseName: 'Gill Vs Stanley',
+                caseNumber: '123456789012345678901234567890',
+                caseType: 'Decree Nisi- ID -5 (case type)',
+                startTime: '08:00',
+                endTime: '08:45',
+                hearingType: 'Application',
+                status: 'Fixed - Unlikely to be moved,',
+                recurrenceDetails: 'Hearing 1 of 2'
+              }
             },
             {
               start: "2021-03-01 11:10", // new Date(2018, 11 - 1, 16, 10, 30)
@@ -291,6 +236,16 @@
               title: "XYA123CASE AB123456",
               content: "Slate & co. vs Best Wedding",
               class: "health",
+              data: {
+                caseName: 'Gill Vs Stanley',
+                caseNumber: '123456789012345678901234567890',
+                caseType: 'Decree Nisi- ID -5 (case type)',
+                startTime: '08:00',
+                endTime: '08:45',
+                hearingType: 'Application',
+                status: 'Fixed - Unlikely to be moved,',
+                recurrenceDetails: 'Hearing 1 of 2'
+              }
             },
             {
               start: "2021-03-01 11:20", // new Date(2018, 11 - 1, 16, 10, 30)
@@ -298,6 +253,16 @@
               title: "XYA123CASE AB123456",
               content: "Slate & co. vs Best Wedding",
               class: "health",
+              data: {
+                caseName: 'Gill Vs Stanley',
+                caseNumber: '123456789012345678901234567890',
+                caseType: 'Decree Nisi- ID -5 (case type)',
+                startTime: '08:00',
+                endTime: '08:45',
+                hearingType: 'Application',
+                status: 'Fixed - Unlikely to be moved,',
+                recurrenceDetails: 'Hearing 1 of 2'
+              }
             },
             {
               start: "2021-03-01 11:30", // new Date(2018, 11 - 1, 16, 10, 30)
@@ -305,6 +270,16 @@
               title: "XYA123CASE AB123456",
               content: "Slate & co. vs Best Wedding",
               class: "health",
+              data: {
+                caseName: 'Gill Vs Stanley',
+                caseNumber: '123456789012345678901234567890',
+                caseType: 'Decree Nisi- ID -5 (case type)',
+                startTime: '08:00',
+                endTime: '08:45',
+                hearingType: 'Application',
+                status: 'Fixed - Unlikely to be moved,',
+                recurrenceDetails: 'Hearing 1 of 2'
+              }
             },
             {
               start: "2021-03-01 11:40", // new Date(2018, 11 - 1, 16, 10, 30)
@@ -312,6 +287,16 @@
               title: "XYA123CASE AB123456",
               content: "Slate & co. vs Best Wedding",
               class: "health",
+              data: {
+                caseName: 'Gill Vs Stanley',
+                caseNumber: '123456789012345678901234567890',
+                caseType: 'Decree Nisi- ID -5 (case type)',
+                startTime: '08:00',
+                endTime: '08:45',
+                hearingType: 'Application',
+                status: 'Fixed - Unlikely to be moved,',
+                recurrenceDetails: 'Hearing 1 of 2'
+              }
             },
             {
               start: "2021-03-01 11:55", // new Date(2018, 11 - 1, 16, 10, 30)
@@ -319,10 +304,19 @@
               title: "XYA123CASE AB123456",
               content: "Slate & co. vs Best Wedding",
               class: "case-normal",
+              data: {
+                caseName: 'Gill Vs Stanley',
+                caseNumber: '123456789012345678901234567890',
+                caseType: 'Decree Nisi- ID -5 (case type)',
+                startTime: '08:00',
+                endTime: '08:45',
+                hearingType: 'Application',
+                status: 'Fixed - Unlikely to be moved,',
+                recurrenceDetails: 'Hearing 1 of 2'
+              }
             },
             
           );
-          console.log(this)
         },
       });
     </script>

@@ -1,0 +1,91 @@
+.color-morning {
+    color:rgba(255, 102, 0, 0.6);
+  }
+  .color-afternoon {
+    color: rgba(0, 4, 255, 0.6);
+  }
+  .business-hours-morning {
+    /* background-color: rgba(255, 255, 0, 0.2); */
+    border-left: 5px solid rgba(255, 102, 0, 0.6);
+  }
+  .business-hours-afternoon {
+    /* background-color: rgba(255, 255, 0, 0.2); */
+    border-left: 5px solid rgba(0, 4, 255, 0.6);
+  }
+  .vuecal__time-cell-line.hours:before {
+    border-color: #42b983;
+  }
+  .case-normal {
+    border-left: 5px solid rgba(12, 134, 12, 0.6);
+    border-top: 1px solid rgba(12, 134, 12, 0.6);
+    border-bottom: 1px solid rgba(12, 134, 12, 0.6);
+    border-right: 1px solid rgba(12, 134, 12, 0.6);
+    left: 5px !important;
+    width: calc(100% - 5px) !important;
+    text-align: left;
+    padding-left: 5px;
+  }
+  .case-information {
+    border: 2px dashed red;
+    left: 5px !important;
+    width: 30px !important;
+    text-align: center;
+  }
+  .case-information .vuecal__event-time {
+    display: none;
+  }
+  .case-information .vuecal__event-content i {
+    color: red;
+    font-size: 1.2em;
+    padding-top: 5px;
+  }
+  #joh .heading-custom {
+    height: 100%;
+    width: 100%;
+  }
+  #joh .heading-custom-1 {
+    text-align: left;
+    display: block;
+    width: 100%;
+    height: 50%;
+  }
+  #joh .heading-custom-2 {
+    width: 100%;
+    height: 100%;
+    display: block;
+    text-align: left;
+    padding-left: 5px;
+  }
+  #joh .vuecal__flex .vuecal__heading {
+    height: 100px;
+  }
+  #joh .heading-custom-1 .heading-name {
+    padding-left: 5px;
+    display: inline-block;
+    margin-top: 10px;
+  }
+  #joh .heading-custom-1 .heading-add {
+    padding-right: 10px;
+    float: right;
+    padding-top: 10px;
+  }
+  .vuecal__cell .business-hours-unavailable {
+    background: repeating-linear-gradient(45deg, transparent, transparent 10px, #f2f2f2 10px, #f2f2f2 20px);/* IE 10+ */
+    color: #999;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  }
+  .vuecal__no-event {
+    z-index: 10;
+  }
+  .case-number {
+    font-weight: bold;
+    margin: 3px;
+  }
+  .case-name {
+    margin: 3px;
+  }
+  .case-time {
+    margin: 3px
+  }
